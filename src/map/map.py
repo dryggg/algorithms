@@ -1,16 +1,16 @@
+from .import map_node
 import numpy as np
-import map_node
 
-class Map:
+class GraphMap:
     map: np.ndarray
-    weight: int
+    width: int
     height: int
 
     def __init__(self):
-        txt_map: np.ndarray = self.__read_txt_map(file_path="map.txt")      
-        self.map = self.__generate_graph_map(txt_map)                       # Сама карта с узлами
-        self.height = len(self.map)                                         # Высота карты
-        self.weight = len(self.map[0])                                      # Ширина карты
+        txt_map: np.ndarray = self.__read_txt_map(file_path="map/map.txt")      
+        self.map: np.ndarray = self.__generate_graph_map(txt_map)                       # Сама карта с узлами
+        self.height: int = len(self.map)                                                # Высота карты
+        self.width: int = len(self.map[0])                                              # Ширина карты
 
     def __read_txt_map(self, file_path: str) -> np.ndarray:
         """Функция для чтения конфигурации карты из файла .txt и перевода ее в массив numpy
@@ -47,6 +47,10 @@ class Map:
                 new_node.x = j
                 new_node.y = i
                 new_node.value = int(txt_map[i][j])
+                new_node.vizited = False
+                new_node.is_part_of_path = False
+                new_node.is_start_point = False
+                new_node.is_target_point = False
 
                 graph_map[-1].append(new_node)
         
@@ -62,7 +66,7 @@ class Map:
         Returns:
             bool: Флаг попадания координат узла в границы карты
         """
-        if x >= 0 and x <= self.weight - 1 and y >= 0 and y <= self.height - 1:
+        if x >= 0 and x <= self.width - 1 and y >= 0 and y <= self.height - 1:
             return True
         return False
 
@@ -105,7 +109,7 @@ class Map:
         Returns:
             map_node.Node: Узел-сосед или None, в случае его отсутствия
         """
-        assert type(node) == map_node.Node, "Node object can't be None type"
+        assert type(node) == map_node.Node, f"node must be Node type, but it's type is {type(node)}"
 
         if neighbor_type == "left":
             return self.get_node_by_coord(x=node.x-1, y=node.y)
@@ -117,7 +121,23 @@ class Map:
             return self.get_node_by_coord(x=node.x, y=node.y+1)
 
         return None
+    
+    def update_node(self, node: map_node.Node) -> bool:
+        """Функция для обновления параметров 
+
+        Args:
+            node (map_node.Node): Обновленный узел
+
+        Returns:
+            bool: Флаг, говорящий о том, успешно ли прошло обновление узла
+        """
+        assert type(node) == map_node.Node, f"node must be Node type, but it's type is {type(node)}"
+
+        if self.check_if_node_exists(node.x, node.y):
+            self.map[node.y][node.x] = node
+            return True
+        return False
 
 if __name__ == "__main__":
-    m = Map()
+    m = GraphMap()
     print(m.get_node_neighbor(node=m.get_node_by_coord(35,20), neighbor_type="bottom"))
