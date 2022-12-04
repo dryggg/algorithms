@@ -122,6 +122,29 @@ class GraphMap:
 
         return None
     
+    def get_all_neighbors(self, node: map_node.Node) -> list:
+        """Функция для получения всех соседей выбранного узла
+
+        Args:
+            node (map_node.Node): Узел, для которого ищутся соседи
+
+        Returns:
+            list: Список узлов-соседей
+        """
+        assert type(node) == map_node.Node, f"node must be Node type, but it's type is {type(node)}"
+        neighbors: list = []
+
+        if self.get_node_by_coord(x=node.x-1, y=node.y) is not None:
+            neighbors.append(self.get_node_by_coord(x=node.x-1, y=node.y))
+        if self.get_node_by_coord(x=node.x+1, y=node.y) is not None:
+            neighbors.append(self.get_node_by_coord(x=node.x+1, y=node.y))
+        if self.get_node_by_coord(x=node.x, y=node.y-1) is not None:
+            neighbors.append(self.get_node_by_coord(x=node.x, y=node.y-1))
+        if self.get_node_by_coord(x=node.x, y=node.y+1) is not None:
+            neighbors.append(self.get_node_by_coord(x=node.x, y=node.y+1))
+
+        return neighbors
+    
     def update_node(self, node: map_node.Node) -> bool:
         """Функция для обновления параметров 
 
@@ -137,7 +160,3 @@ class GraphMap:
             self.map[node.y][node.x] = node
             return True
         return False
-
-if __name__ == "__main__":
-    m = GraphMap()
-    print(m.get_node_neighbor(node=m.get_node_by_coord(35,20), neighbor_type="bottom"))
