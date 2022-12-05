@@ -28,9 +28,19 @@ class DijkstraNode:
 
 class DijkstraAlgorithm:
     def __init__(self):
-        self.start_max_weight = 10000000
+        self.start_max_weight = 100000
 
     def dijkstra_algorithm(self, map: GraphMap, start_point: tuple, target_point: tuple) -> list:
+        """Реализация поиска кратчайшего пути в графе по алгоритму Дейкстры
+
+        Args:
+            map (GraphMap): Карта в виде графа
+            start_point (tuple): Координаты стартовой точки
+            target_point (tuple): Координаты целевой точки
+
+        Returns:
+            list: Путь от стартовой к целевой точке
+        """
         points_array: list = []
 
         # Словарь соответствия id ноды ее экземпляру
@@ -48,7 +58,8 @@ class DijkstraAlgorithm:
         
         for i in range(len(map.map)):
             for j in range(len(map.map[i])):
-                points_array.append(DijkstraNode(map.map[i][j], self.start_max_weight, []))
+                if map.map[i][j].value != 0:
+                    points_array.append(DijkstraNode(map.map[i][j], self.start_max_weight, []))
         
         start_point_node: Node = map.get_node_by_coord(start_point[0], start_point[1])
         start_point_node_number: int = inverted_correspondence_dict[start_point_node]
@@ -60,20 +71,16 @@ class DijkstraAlgorithm:
         unvisited_node_found_flag = True
 
         while unvisited_node_found_flag:
-            # print(current_node)
             current_node_id: int = inverted_correspondence_dict[current_node]
             neighbors: list = map.get_all_neighbors(current_node)
-            # print(neighbors)
             for neighbor in neighbors:
                 neighbor_id: int = inverted_correspondence_dict[neighbor]
-                # if not points_array[neighbor_id].visited:
                 if points_array[neighbor_id].summ_weight > neighbor.value + points_array[current_node_id].summ_weight:
                     points_array[neighbor_id].summ_weight = neighbor.value + points_array[current_node_id].summ_weight
                     points_array[neighbor_id].path = copy(points_array[current_node_id].path)
                     points_array[neighbor_id].add_to_path(neighbor)
 
                 points_array[current_node_id].visited = True
-            print(points_array)
             sorted_array = self.__sort_dijkstra_nodes_array(points_array)
             unvisited_node_found_flag = False
             for dijkstra_node in sorted_array:
@@ -81,7 +88,6 @@ class DijkstraAlgorithm:
                     current_node = dijkstra_node.node
                     unvisited_node_found_flag = True
                     break
-            # print(unvisited_node_found_flag)
 
         target_node: Node = map.get_node_by_coord(target_point[0], target_point[1])
         target_node_id: int = inverted_correspondence_dict[target_node]
