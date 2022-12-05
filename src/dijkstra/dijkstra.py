@@ -105,12 +105,11 @@ class DijkstraAlgorithm:
         """
         new_array: list = []
         for elem in dijkstra_node_array:
-            new_array.append(elem)
+            if not elem.visited:
+                new_array.append(elem)
 
         for i in range(len(new_array)-1):
             for j in range(len(new_array)-i-1):
                 if new_array[j].summ_weight > new_array[j+1].summ_weight:
-                    temp = new_array[j]
-                    new_array[j] = new_array[j+1]
-                    new_array[j+1] = temp
+                    new_array[j], new_array[j+1] = new_array[j+1], new_array[j]
         return new_array
