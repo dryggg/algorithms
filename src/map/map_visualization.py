@@ -18,6 +18,12 @@ class MapVisualizator:
         self.start_node_square_color: tuple = (111, 255, 0)         # Цвет квадрата, обозначающего стартовый узел
         self.target_node_square_color: tuple = (0, 0, 251)          # Цвет квадрата, обозначающего целевой узел
 
+        self.text_font: int = cv2.FONT_HERSHEY_SIMPLEX
+        self.text_font_scale: float = 0.4
+        self.text_thickness: int = 1
+        self.text_color: tuple = (0, 0, 0)
+
+
     def __find_window_size(self, map: GraphMap) -> list:
         """Функция для нахождения оптимального размера окна визуализации
 
@@ -75,5 +81,11 @@ class MapVisualizator:
                     cv2.rectangle(frame, point1, point2, self.node_square_border_color, self.node_square_border_thickness)
                 else:
                     cv2.rectangle(frame, point1, point2, self.node_square_border_color, -1)
+                
+                text_size, _ = cv2.getTextSize(str(node.value), self.text_font, self.text_font_scale, self.text_thickness)
+                text_point: tuple = (self.edge_indent + node_side_size*node.x + int(node_side_size/2) - int(text_size[0]/2), self.edge_indent + node_side_size*node.y + int(node_side_size/2) + int(text_size[1]/2))
+                cv2.putText(frame, str(node.value), text_point, self.text_font, self.text_font_scale, self.text_color, self.text_thickness)
+
+
         
         return frame
