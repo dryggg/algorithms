@@ -1,5 +1,5 @@
-from map.map_node import Node
-from map.map import GraphMap
+from map_worker.map_node import Node
+from map_worker.map import GraphMap
 from copy import copy
 import numpy as np
 

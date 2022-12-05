@@ -6,8 +6,8 @@ class GraphMap:
     width: int
     height: int
 
-    def __init__(self):
-        txt_map: np.ndarray = self.__read_txt_map(file_path="map/map.txt")      
+    def __init__(self, map_path):
+        txt_map: np.ndarray = self.__read_txt_map(file_path=map_path)      
         self.map: np.ndarray = self.__generate_graph_map(txt_map)                       # Сама карта с узлами
         self.height: int = len(self.map)                                                # Высота карты
         self.width: int = len(self.map[0])                                              # Ширина карты

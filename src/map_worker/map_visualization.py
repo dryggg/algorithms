@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 class MapVisualizator:
-    def __init__(self):
+    def __init__(self, show_weights: bool = True):
         self.max_window_width: int = 2000                           # Максимальная ширина окна
         self.max_window_height: int = 1200                          # Максимальная высота окна
         self.edge_indent: int = 25                                  # Отступ от края
@@ -22,6 +22,8 @@ class MapVisualizator:
         self.text_font_scale: float = 0.4
         self.text_thickness: int = 1
         self.text_color: tuple = (0, 0, 0)
+
+        self.show_weights = show_weights
 
 
     def __find_window_size(self, map: GraphMap) -> list:
@@ -82,10 +84,9 @@ class MapVisualizator:
                 else:
                     cv2.rectangle(frame, point1, point2, self.node_square_border_color, -1)
                 
-                text_size, _ = cv2.getTextSize(str(node.value), self.text_font, self.text_font_scale, self.text_thickness)
-                text_point: tuple = (self.edge_indent + node_side_size*node.x + int(node_side_size/2) - int(text_size[0]/2), self.edge_indent + node_side_size*node.y + int(node_side_size/2) + int(text_size[1]/2))
-                cv2.putText(frame, str(node.value), text_point, self.text_font, self.text_font_scale, self.text_color, self.text_thickness)
-
-
+                if self.show_weights:
+                    text_size, _ = cv2.getTextSize(str(node.value), self.text_font, self.text_font_scale, self.text_thickness)
+                    text_point: tuple = (self.edge_indent + node_side_size*node.x + int(node_side_size/2) - int(text_size[0]/2), self.edge_indent + node_side_size*node.y + int(node_side_size/2) + int(text_size[1]/2))
+                    cv2.putText(frame, str(node.value), text_point, self.text_font, self.text_font_scale, self.text_color, self.text_thickness)
         
         return frame
