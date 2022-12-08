@@ -3,17 +3,19 @@ from map_worker.map import GraphMap
 from copy import copy
 import numpy as np
 
-class DijkstraNode:
+class AStarNode:
     node: Node
     summ_weight: int
+    priority: int
     path: list
     visited: bool
 
-    def __init__(self, node: Node, summ_weight: int, path: list):
+    def __init__(self, node: Node, summ_weight: int, path: list, priority: int):
         self.node = node
         self.summ_weight = summ_weight
         self.path = path
         self.visited = False
+        self.priority = priority
     
     def add_to_path(self, node: Node) -> None:
         self.path.append(node)
@@ -26,12 +28,15 @@ class DijkstraNode:
         # return f"node: {self.node}, path: {self.path}"
         return str(self.path)
 
-class DijkstraAlgorithm:
+class AStarAlgorithm:
     def __init__(self):
         self.start_max_weight = 100000
 
-    def dijkstra_algorithm(self, map: GraphMap, start_point: tuple, target_point: tuple) -> list:
-        """Реализация поиска кратчайшего пути в графе по алгоритму Дейкстры
+    def heuristic(self, start_point: tuple, target_point: tuple) -> int:
+        return abs(start_point[0]- target_point[0]) + abs(start_point[1] - target_point[1])
+
+    def algorithm(self, map: GraphMap, start_point: tuple, target_point: tuple) -> list:
+        """Реализация поиска кратчайшего пути в графе по алгоритму A*
 
         Args:
             map (GraphMap): Карта в виде графа
@@ -39,7 +44,7 @@ class DijkstraAlgorithm:
             target_point (tuple): Координаты целевой точки
 
         Returns:
-            list: Путь от стартовой к целевой точке
+            list: Новая карта
         """
         points_array: list = []
 
@@ -59,11 +64,11 @@ class DijkstraAlgorithm:
         for i in range(len(map.map)):
             for j in range(len(map.map[i])):
                 if map.map[i][j].value != 0:
-                    points_array.append(DijkstraNode(map.map[i][j], self.start_max_weight, []))
+                    points_array.append(AStarNode(map.map[i][j], self.start_max_weight, [], self.start_max_weight))
         
         start_point_node: Node = map.get_node_by_coord(start_point[0], start_point[1])
         start_point_node_number: int = self.inverted_correspondence_dict[start_point_node]
-        points_array[start_point_node_number] = DijkstraNode(start_point_node, 0, [start_point_node])
+        points_array[start_point_node_number] = AStarNode(start_point_node, 0, [start_point_node], self.heuristic(start_point, target_point))
         
         current_node: Node = start_point_node
 
@@ -79,6 +84,7 @@ class DijkstraAlgorithm:
                     points_array[neighbor_id].summ_weight = neighbor.value + points_array[current_node_id].summ_weight
                     points_array[neighbor_id].path = copy(points_array[current_node_id].path)
                     points_array[neighbor_id].add_to_path(neighbor)
+                    points_array[neighbor_id].priority = points_array[neighbor_id].summ_weight + self.heuristic((neighbor.x, neighbor.y), target_point)
 
                 points_array[current_node_id].visited = True
                 
@@ -147,6 +153,6 @@ class DijkstraAlgorithm:
 
         for i in range(len(new_array)-1):
             for j in range(len(new_array)-i-1):
-                if new_array[j].summ_weight > new_array[j+1].summ_weight:
+                if new_array[j].priority > new_array[j+1].priority:
                     new_array[j], new_array[j+1] = new_array[j+1], new_array[j]
         return new_array
