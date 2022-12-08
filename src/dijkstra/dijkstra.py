@@ -105,7 +105,7 @@ class DijkstraAlgorithm:
         """
         new_array: list = []
         for elem in dijkstra_node_array:
-            if not elem.visited:
+            if not elem.visited and elem.summ_weight < self.start_max_weight:
                 new_array.append(elem)
 
         for i in range(len(new_array)-1):
