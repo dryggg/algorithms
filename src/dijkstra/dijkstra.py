@@ -83,7 +83,6 @@ class DijkstraAlgorithm:
                 points_array[current_node_id].visited = True
                 
                 points_array[current_node_id].node.vizited = True
-                print(points_array[current_node_id].node)
             sorted_array = self.__sort_dijkstra_nodes_array(points_array)
             for dijkstra_node in sorted_array:
                 if not dijkstra_node.visited:
@@ -96,7 +95,18 @@ class DijkstraAlgorithm:
         map = self.update_map(map, points_array, start_point, target_point)
         return map
 
-    def update_map(self, map: list, points_array: list, start_point: tuple, target_point: tuple):
+    def update_map(self, map: list, points_array: list, start_point: tuple, target_point: tuple) -> list:
+        """Функция для генерации карты для отображения
+
+        Args:
+            map (list): Изначальная карта
+            points_array (list): Актуальный массив точек
+            start_point (tuple): Стартовая точка
+            target_point (tuple): Целевая точка
+
+        Returns:
+            list: Обновленная карта
+        """
         target_node: Node = map.get_node_by_coord(target_point[0], target_point[1])
         target_node_id: int = self.inverted_correspondence_dict[target_node]
 

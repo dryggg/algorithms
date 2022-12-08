@@ -10,7 +10,6 @@ if __name__ == "__main__":
 
     show_weights_flag = True
 
-
     m = GraphMap(map_path="maps/map.txt")
     d = DijkstraAlgorithm()
 

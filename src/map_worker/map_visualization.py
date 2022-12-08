@@ -68,7 +68,6 @@ class MapVisualizator:
 
                 if node.value != 0:
                     # Заполненный кварат с цветом, соответствующим типу узла
-                    # print(node)
                     if node.is_start_point:
                         cv2.rectangle(frame, point1, point2, self.start_node_square_color, -1)
                     elif node.is_target_point:
