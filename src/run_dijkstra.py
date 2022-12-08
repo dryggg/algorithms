@@ -15,26 +15,14 @@ if __name__ == "__main__":
     d = DijkstraAlgorithm()
 
     start_time = datetime.now()
-    target_path: list = d.dijkstra_algorithm(m, start_point, target_point)
+    new_map: list = d.dijkstra_algorithm(m, start_point, target_point)
     finish_time = datetime.now()
 
     delta_time = finish_time - start_time
     print(delta_time.seconds)
 
-    for node in target_path:
-        node.is_part_of_path = True
-        m.update_node(node)
-    
-    node = m.get_node_by_coord(start_point[0], start_point[1])
-    node.is_start_point = True
-    m.update_node(node)
-
-    node = m.get_node_by_coord(target_point[0], target_point[1])
-    node.is_target_point = True
-    m.update_node(node)
-
     viz = MapVisualizator(show_weights=show_weights_flag)
-    frame = viz.generate_map_frame(m)
+    frame = viz.generate_map_frame(new_map)
 
     cv2.imshow("Map", frame)
     cv2.waitKey(0)

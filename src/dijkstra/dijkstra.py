@@ -46,14 +46,14 @@ class DijkstraAlgorithm:
         # Словарь соответствия id ноды ее экземпляру
         correspondence_dict: dict = {}
         # Словарь соответствия экземпляра ноды ее id
-        inverted_correspondence_dict: dict = {}
+        self.inverted_correspondence_dict: dict = {}
 
         counter: int = 0
         for line in map.map:
             for node in line:
                 if node.value != 0:
                     correspondence_dict[counter] = node
-                    inverted_correspondence_dict[node] = counter
+                    self.inverted_correspondence_dict[node] = counter
                     counter += 1
         
         for i in range(len(map.map)):
@@ -62,37 +62,64 @@ class DijkstraAlgorithm:
                     points_array.append(DijkstraNode(map.map[i][j], self.start_max_weight, []))
         
         start_point_node: Node = map.get_node_by_coord(start_point[0], start_point[1])
-        start_point_node_number: int = inverted_correspondence_dict[start_point_node]
+        start_point_node_number: int = self.inverted_correspondence_dict[start_point_node]
         points_array[start_point_node_number] = DijkstraNode(start_point_node, 0, [start_point_node])
         
         current_node: Node = start_point_node
 
         # Флаг, говорящий о том, есть ли еще непосещенные узлы
-        unvisited_node_found_flag = True
+        finish_flag = False
 
-        while unvisited_node_found_flag:
-            current_node_id: int = inverted_correspondence_dict[current_node]
+        while not finish_flag:
+            current_node_id: int = self.inverted_correspondence_dict[current_node]
             neighbors: list = map.get_all_neighbors(current_node)
             for neighbor in neighbors:
-                neighbor_id: int = inverted_correspondence_dict[neighbor]
+                neighbor_id: int = self.inverted_correspondence_dict[neighbor]
                 if points_array[neighbor_id].summ_weight > neighbor.value + points_array[current_node_id].summ_weight:
                     points_array[neighbor_id].summ_weight = neighbor.value + points_array[current_node_id].summ_weight
                     points_array[neighbor_id].path = copy(points_array[current_node_id].path)
                     points_array[neighbor_id].add_to_path(neighbor)
 
                 points_array[current_node_id].visited = True
+                
+                points_array[current_node_id].node.vizited = True
+                print(points_array[current_node_id].node)
             sorted_array = self.__sort_dijkstra_nodes_array(points_array)
-            unvisited_node_found_flag = False
             for dijkstra_node in sorted_array:
                 if not dijkstra_node.visited:
                     current_node = dijkstra_node.node
-                    unvisited_node_found_flag = True
                     break
+                
+            if current_node == map.get_node_by_coord(target_point[0], target_point[1]):
+                finish_flag = True
 
+        map = self.update_map(map, points_array, start_point, target_point)
+        return map
+
+    def update_map(self, map: list, points_array: list, start_point: tuple, target_point: tuple):
         target_node: Node = map.get_node_by_coord(target_point[0], target_point[1])
-        target_node_id: int = inverted_correspondence_dict[target_node]
+        target_node_id: int = self.inverted_correspondence_dict[target_node]
 
-        return points_array[target_node_id].path
+        counter = 0
+        for i in range(len(map.map)):
+            for j in range(len(map.map[i])):
+                if map.map[i][j].value != 0:
+                    map.map[i][j] = points_array[counter].node
+                    counter +=1
+
+        for node in points_array[target_node_id].path:
+            node.is_part_of_path = True
+            map.update_node(node)
+        
+        node = map.get_node_by_coord(start_point[0], start_point[1])
+        node.is_start_point = True
+        map.update_node(node)
+
+        node = map.get_node_by_coord(target_point[0], target_point[1])
+        node.is_target_point = True
+        map.update_node(node)
+
+        return map
 
     def __sort_dijkstra_nodes_array(self, dijkstra_node_array: list) -> list:
         """Функция для сортировки массива из объектов DijkstraNode по суммарному весу
